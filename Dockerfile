@@ -19,8 +19,11 @@ COPY . .
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
+# Train the model so model.bin exists in the image
+RUN uv run python src/train.py
+
 ENV PATH="/app/.venv/bin:$PATH"
 
 EXPOSE 9696
 
-ENTRYPOINT ["gunicorn", "--bind=0.0.0.0:9696", "predict:app"]
+ENTRYPOINT ["uvicorn", "src.predict:app", "--host", "0.0.0.0", "--port", "9696"]
